@@ -2,6 +2,7 @@
 # draws with has to be installed and selected over there.
 
 FONT_FACE="Hack Nerd Font"
+COLOR_SCHEME="One Half Dark"
 
 # $1: directory holding the font's .ttf files on the Linux side.
 setup_windows_font() {
@@ -17,7 +18,7 @@ setup_windows_font() {
   appdata="$(wslpath -u "$appdata_win")"
 
   install_windows_font "$1" "$appdata" "$appdata_win"
-  set_windows_terminal_font "$appdata"
+  set_windows_terminal_profile "$appdata"
 }
 
 # Per-user install: needs no admin rights, but each file has to be registered.
@@ -40,11 +41,12 @@ install_windows_font() {
   done
 }
 
-# Sets the font on this distro's Windows Terminal profile.
-set_windows_terminal_font() {
+# Sets the font and color scheme on this distro's Windows Terminal profile.
+set_windows_terminal_profile() {
   local appdata="$1"
   local profile="${WSL_DISTRO_NAME:-}"
   local backup="$HOME/.local/state/bootstrap/backup/$(date +%Y%m%d-%H%M%S)/windows-terminal"
+  local wanted="$FONT_FACE / $COLOR_SCHEME"
   local settings current tmp
 
   for settings in \
@@ -53,23 +55,24 @@ set_windows_terminal_font() {
     [ -f "$settings" ] || continue
 
     if ! current="$(jq -r --arg name "$profile" \
-      '[.profiles.list[] | select(.name == $name) | .font.face // ""] | first // "missing"' \
+      '[.profiles.list[] | select(.name == $name) | "\(.font.face // "") / \(.colorScheme // "")"] | first // "missing"' \
       "$settings" 2>/dev/null)"; then
-      warn "cannot parse $settings, set the font to '$FONT_FACE' by hand"
+      warn "cannot parse $settings, set the font and color scheme ($wanted) by hand"
       continue
     fi
-    if [ "$current" = "$FONT_FACE" ]; then continue; fi
+    if [ "$current" = "$wanted" ]; then continue; fi
     if [ "$current" = missing ]; then
-      warn "no Windows Terminal profile named '$profile', set the font to '$FONT_FACE' by hand"
+      warn "no Windows Terminal profile named '$profile', set the font and color scheme ($wanted) by hand"
       continue
     fi
 
-    log "Setting the Windows Terminal font for the $profile profile"
+    log "Setting the Windows Terminal font and color scheme for the $profile profile"
     run mkdir -p "$backup"
     run cp "$settings" "$backup/settings.json"
     tmp="$(mktemp)"
-    jq --indent 4 --arg name "$profile" --arg face "$FONT_FACE" \
-      '(.profiles.list[] | select(.name == $name)).font.face = $face' "$settings" > "$tmp"
+    jq --indent 4 --arg name "$profile" --arg face "$FONT_FACE" --arg scheme "$COLOR_SCHEME" \
+      '(.profiles.list[] | select(.name == $name)) |= (.font.face = $face | .colorScheme = $scheme)' \
+      "$settings" > "$tmp"
     run cp "$tmp" "$settings"
     rm -f "$tmp"
   done

@@ -1,6 +1,7 @@
 set -g fish_greeting
 
 set -gx XDG_CONFIG_HOME ~/.config
+set -gx EDITOR nvim
 
 fish_add_path -g ~/.local/bin
 
