@@ -21,7 +21,12 @@ install_packages() {
   local pkgs=() pkg
   while IFS= read -r pkg; do
     pkgs+=("$pkg")
-  done < <(read_list "$ROOT/packages/common.txt"; read_list "$ROOT/packages/$PM.txt")
+  done < <(
+    read_list "$ROOT/packages/common.txt"
+    read_list "$ROOT/packages/$PM.txt"
+    # Desktop apps are pointless inside WSL.
+    if [ "$IS_WSL" = 0 ]; then read_list "$ROOT/packages/$PM-desktop.txt"; fi
+  )
 
   if [ "$PM" = brew ]; then ensure_brew; fi
 
@@ -40,6 +45,31 @@ install_packages() {
 
   # On macOS the font is a regular brew package, see packages/brew.txt.
   if [ "$OS" = linux ]; then install_nerd_font; fi
+  if [ "$OS" = macos ]; then install_ghostty_macos; fi
+}
+
+# Ghostty's official macOS build. Linux has no official build, so there it
+# comes from the distro, see packages/apt-desktop.txt.
+install_ghostty_macos() {
+  local url tmp
+
+  if [ -d /Applications/Ghostty.app ]; then return 0; fi
+
+  log "Installing Ghostty"
+  url="$(curl -fsSL https://ghostty.org/download \
+    | grep -oE 'https://release\.files\.ghostty\.org/[^"]+/Ghostty\.dmg' | head -n 1 || true)"
+  if [ -z "$url" ]; then
+    warn "no Ghostty.dmg link found on https://ghostty.org/download, skipping"
+    return 0
+  fi
+
+  tmp="$(mktemp -d)"
+  run curl -fsSL -o "$tmp/Ghostty.dmg" "$url"
+  run mkdir "$tmp/mount"
+  run hdiutil attach "$tmp/Ghostty.dmg" -nobrowse -quiet -mountpoint "$tmp/mount"
+  run cp -R "$tmp/mount/Ghostty.app" /Applications/
+  run hdiutil detach "$tmp/mount" -quiet
+  rm -rf "$tmp"
 }
 
 # Hack Nerd Font, which the tide prompt needs for its icons. apt and dnf don't

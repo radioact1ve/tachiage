@@ -1,0 +1,2 @@
+# Desktop apps for Debian/Ubuntu. Skipped on WSL. One per line.
+ghostty

@@ -35,7 +35,8 @@ Every step is safe to re-run.
   run `./bootstrap.sh link`. A file already at that path is moved to
   `~/.local/state/bootstrap/backup/<timestamp>/`.
 - **A system package**: add it to `packages/common.txt` if the name is the same
-  everywhere, otherwise to the per package manager files.
+  everywhere, otherwise to the per package manager files. Desktop apps go in
+  `packages/<brew|apt|dnf>-desktop.txt`, which WSL skips.
 - **A dev tool or runtime**: `mise use -g <tool>@<version>`. That edits the
   linked config, so just commit the change.
 - **A fish plugin**: `fisher install <plugin>`. That edits the linked
