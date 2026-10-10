@@ -7,3 +7,4 @@ ripgrep
 tree-sitter-cli
 fzf
 luarocks
+tig

@@ -13,6 +13,8 @@
 
 [delta]
 	navigate = true
+	side-by-side = true
+	dark = true
 
 # Machine-specific overrides (e.g. a work email) live here, outside the repo.
 [include]

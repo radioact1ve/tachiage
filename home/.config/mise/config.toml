@@ -12,3 +12,4 @@ go = "latest"
 rust = { version = "latest", components = "rust-analyzer" }
 terraform = "latest"
 yq = "latest"
+zoxide = "latest"
