@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Entry point for a fresh machine: gets git, clones this repo, runs bootstrap.sh.
 #
-#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/CHANGEME/tachiage/main/install.sh)"
+#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/radioact1ve/tachiage/main/install.sh)"
 set -euo pipefail
 
-REPO_URL="${BOOTSTRAP_REPO:-https://github.com/CHANGEME/tachiage.git}"
+REPO_URL="${BOOTSTRAP_REPO:-https://github.com/radioact1ve/tachiage.git}"
 DEST="${BOOTSTRAP_DIR:-$HOME/code/tachiage}"
 
 die() { printf 'error: %s\n' "$*" >&2; exit 1; }
@@ -15,10 +15,6 @@ as_root() {
 
 # Wrapped in a function so a truncated download never runs half a script.
 main() {
-  case "$REPO_URL" in
-    *CHANGEME*) die "set the GitHub user in install.sh (or export BOOTSTRAP_REPO)" ;;
-  esac
-
   if [ "$(uname -s)" = Darwin ]; then
     # /usr/bin/git on macOS is a stub until the Command Line Tools are installed.
     if ! xcode-select -p >/dev/null 2>&1; then
