@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Entry point for a fresh machine: gets git, clones this repo, runs bootstrap.sh.
 #
-#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/CHANGEME/bootstrap/main/install.sh)"
+#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/CHANGEME/tachiage/main/install.sh)"
 set -euo pipefail
 
-REPO_URL="${BOOTSTRAP_REPO:-https://github.com/CHANGEME/bootstrap.git}"
-DEST="${BOOTSTRAP_DIR:-$HOME/code/bootstrap}"
+REPO_URL="${BOOTSTRAP_REPO:-https://github.com/CHANGEME/tachiage.git}"
+DEST="${BOOTSTRAP_DIR:-$HOME/code/tachiage}"
 
 die() { printf 'error: %s\n' "$*" >&2; exit 1; }
 

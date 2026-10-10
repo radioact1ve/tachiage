@@ -1,4 +1,4 @@
-# bootstrap
+# tachiage
 
 Sets up a new machine with my configs and software. Works on macOS, Linux
 (apt and dnf based distros) and WSL.
@@ -6,10 +6,10 @@ Sets up a new machine with my configs and software. Works on macOS, Linux
 ## New machine
 
 ```sh
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/CHANGEME/bootstrap/main/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/CHANGEME/tachiage/main/install.sh)"
 ```
 
-This installs git if needed, clones the repo to `~/code/bootstrap` and runs
+This installs git if needed, clones the repo to `~/code/tachiage` and runs
 `bootstrap.sh`.
 
 ## Usage
