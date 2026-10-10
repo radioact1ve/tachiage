@@ -1,0 +1,7 @@
+# Debian/Ubuntu only packages, or ones named differently here. One per line.
+xz-utils
+build-essential
+fd-find
+libsqlite3-dev
+lua5.1
+unzip

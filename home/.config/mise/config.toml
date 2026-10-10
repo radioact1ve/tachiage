@@ -1,0 +1,14 @@
+# Dev tools and language runtimes, identical on every machine.
+# Add with `mise use -g <tool>@<version>` or edit here, then run `./bootstrap.sh mise`.
+[tools]
+neovim = "latest"
+node = "lts"
+ast-grep = "latest"
+bat = "latest"
+delta = "latest"
+eza = "latest"
+lazygit = "latest"
+go = "latest"
+rust = { version = "latest", components = "rust-analyzer" }
+terraform = "latest"
+yq = "latest"

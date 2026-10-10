@@ -1,0 +1,9 @@
+# Packages with the same name in brew, apt and dnf. One per line.
+curl
+fish
+git
+jq
+ripgrep
+tree-sitter-cli
+fzf
+luarocks
