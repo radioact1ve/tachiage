@@ -1,6 +1,5 @@
 # Fedora/RHEL only packages, or ones named differently here. One per line.
 xz
-fd-find
 gcc
 compat-lua
 sqlite-devel

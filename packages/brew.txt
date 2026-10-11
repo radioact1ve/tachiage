@@ -1,3 +1,2 @@
 # macOS only packages, or ones named differently here. One per line.
 font-hack-nerd-font
-fd

@@ -3,8 +3,5 @@ curl
 fish
 git
 jq
-ripgrep
-tree-sitter-cli
-fzf
 luarocks
 tig
