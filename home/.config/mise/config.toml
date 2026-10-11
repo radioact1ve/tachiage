@@ -3,6 +3,7 @@
 [tools]
 neovim = "latest"
 node = "lts"
+pi = "latest"
 ast-grep = "latest"
 bat = "latest"
 bottom = "latest"
