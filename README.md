@@ -41,6 +41,9 @@ Every step is safe to re-run.
   linked config, so just commit the change.
 - **A fish plugin**: `fisher install <plugin>`. That edits the linked
   `fish_plugins`, so just commit the change.
+- **An agent skill**: put your own under `home/.agents/skills/<name>/`. For
+  skills from another GitHub repo, add a line to `packages/skills.txt` and run
+  `./bootstrap.sh link`.
 - **Another package manager**: add a detection branch in `lib/common.sh`, an
   install branch in `lib/packages.sh`, and a `packages/<name>.txt`.
 

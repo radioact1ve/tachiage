@@ -1,0 +1,106 @@
+# Fetches the agent skill sources in packages/skills.txt and links each skill
+# they contain into ~/.agents/skills, next to the skills kept in this repo.
+# Each skill there is then also linked into ~/.claude/skills.
+
+SKILLS_CACHE="${XDG_DATA_HOME:-$HOME/.local/share}/bootstrap/skills"
+
+# ~/.agents/skills is a symlink into this repo, so fetched skills are listed in
+# a generated .gitignore there to keep them out of git.
+write_skills_ignore() {
+  printf '.gitignore\n%s' "$SKILLS_IGNORE" > "$1"
+}
+
+# Claude Code only loads skills from ~/.claude/skills, so every skill in
+# ~/.agents/skills gets a link there too.
+link_claude_skills() {
+  local skills_dir="$1"
+  local claude_dir="$HOME/.claude/skills"
+  local entry name dst
+
+  # No ~/.claude/skills means no Claude Code here, so there is nothing to do.
+  [ -d "$claude_dir" ] || return 0
+
+  for entry in "$skills_dir"/*; do
+    [ -f "$entry/SKILL.md" ] || continue
+    name="$(basename "$entry")"
+    dst="$claude_dir/$name"
+
+    # Anything else already there is left alone.
+    if [ -e "$dst" ] || [ -L "$dst" ]; then
+      continue
+    fi
+
+    run ln -s "$entry" "$dst"
+    printf '  linked ~/.claude/skills/%s\n' "$name"
+  done
+
+  # Drop links to skills that are gone from ~/.agents/skills.
+  for entry in "$claude_dir"/*; do
+    [ -L "$entry" ] && [ ! -e "$entry" ] || continue
+    case "$(readlink "$entry")" in "$skills_dir"/*) ;; *) continue ;; esac
+    run rm "$entry"
+    printf '  removed ~/.claude/skills/%s\n' "$(basename "$entry")"
+  done
+}
+
+install_skills() {
+  local list="$ROOT/packages/skills.txt"
+  local skills_dir="$HOME/.agents/skills"
+  local nl='
+'
+  local claimed="$nl"
+  local repo path clone file src name dst entry
+
+  log "Fetching agent skills into $skills_dir"
+  while read -r repo path <&3; do
+    clone="$SKILLS_CACHE/$(printf '%s' "$repo" | tr / _)"
+    if [ -d "$clone/.git" ]; then
+      run_quiet git -C "$clone" pull --quiet --ff-only || warn "could not update $repo"
+    else
+      run mkdir -p "$SKILLS_CACHE"
+      run git clone --quiet --depth 1 "https://github.com/$repo.git" "$clone"
+    fi
+    [ -d "$clone/${path:-.}" ] || continue
+
+    while IFS= read -r -d '' file; do
+      src="$(dirname "$file")"
+      name="$(basename "$src")"
+      dst="$skills_dir/$name"
+
+      # An earlier source already provides a skill with this name.
+      case "$claimed" in *"$nl$name$nl"*) continue ;; esac
+
+      if [ -L "$dst" ]; then
+        case "$(readlink "$dst")" in
+          "$src") claimed="$claimed$name$nl"; continue ;;
+          "$SKILLS_CACHE"/*) run rm "$dst" ;;
+          *) continue ;;
+        esac
+      elif [ -e "$dst" ]; then
+        # A skill kept in this repo wins over a fetched one.
+        continue
+      fi
+
+      run ln -s "$src" "$dst"
+      claimed="$claimed$name$nl"
+      printf '  linked ~/.agents/skills/%s\n' "$name"
+    done < <(find "$clone/${path:-.}" -name .git -prune -o -type f -name SKILL.md -print0)
+  done 3< <(read_list "$list")
+
+  # Drop links to skills that a source no longer ships.
+  for entry in "$skills_dir"/*; do
+    [ -L "$entry" ] || continue
+    case "$(readlink "$entry")" in "$SKILLS_CACHE"/*) ;; *) continue ;; esac
+    name="$(basename "$entry")"
+    case "$claimed" in *"$nl$name$nl"*) continue ;; esac
+    run rm "$entry"
+    printf '  removed ~/.agents/skills/%s\n' "$name"
+  done
+
+  SKILLS_IGNORE="${claimed#"$nl"}"
+  if [ -d "$skills_dir" ] && [ "$(cat "$skills_dir/.gitignore" 2>/dev/null)" != "$(printf '.gitignore\n%s' "$SKILLS_IGNORE")" ]; then
+    run write_skills_ignore "$skills_dir/.gitignore"
+  fi
+
+  link_claude_skills "$skills_dir"
+}

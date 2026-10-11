@@ -1,0 +1,9 @@
+# Agent skill sources, fetched into ~/.agents/skills by the link step.
+# One GitHub repo per line: owner/repo [directory to search for SKILL.md files]
+# When two sources ship a skill with the same name, the one listed first wins.
+obra/superpowers skills
+dietrichgebert/ponytail skills
+mattpocock/skills skills
+mojomanyana/principal-pi-skills
+addyosmani/agent-skills skills
+AminBlg/SimpleEnglish skills

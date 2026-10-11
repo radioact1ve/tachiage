@@ -18,7 +18,7 @@ Two entry points:
 | Step       | Function             | What it does |
 | ---------- | -------------------- | ------------ |
 | `packages` | `install_packages`   | Native packages from `packages/*.txt`, plus installs that have no native package |
-| `link`     | `link_home`          | Symlinks every file under `home/` to the same path in `$HOME` |
+| `link`     | `link_home`          | Symlinks every file under `home/` to the same path in `$HOME`, fetches the agent skills in `packages/skills.txt` |
 | `mise`     | `install_mise_tools` | Installs mise, then the tools in `home/.config/mise/config.toml` |
 | `shell`    | `setup_fish`         | Makes fish the login shell, installs fisher and the plugins in `fish_plugins` |
 
@@ -31,6 +31,7 @@ lib/common.sh         log/warn/die, run (dry-run aware), detect_platform, read_l
 lib/packages.sh       native package installs and mise
 lib/wsl.sh            Windows-side font install and Windows Terminal profile
 lib/link.sh           symlinking of home/
+lib/skills.sh         fetching of third-party agent skills
 lib/shell.sh          fish login shell and fisher
 packages/             one package name per line, `#` comments allowed
 home/                 mirrors $HOME; everything here gets symlinked
@@ -44,7 +45,9 @@ exists, not by distro name.
 
 **A config file.** Put it under `home/` at the path it has in `$HOME`. Files are
 linked one by one, not whole directories, so programs can keep their own state
-next to them without it landing in the repo. A new file only takes effect on a
+next to them without it landing in the repo. The exceptions are the
+directories named in `LINK_DIRS` in `lib/link.sh`, which are linked whole, so
+anything written there lands in the repo. A new file only takes effect on a
 machine after `./bootstrap.sh link` runs there. An existing real file at the
 target is moved to `~/.local/state/bootstrap/backup/<timestamp>/`, never
 deleted.
@@ -66,6 +69,17 @@ deleted.
 Before using a native package, check what the distro actually ships. Names and
 binaries differ: Debian's `bat` installs `batcat`, and apt's `yq` is a different
 program from brew's. That kind of mismatch is a reason to use mise.
+
+**An agent skill.** For one kept in this repo, add
+`home/.agents/skills/<name>/SKILL.md`. The directory is linked whole to
+`~/.agents/skills`, so no `link` run is needed once the link exists. For skills
+from another GitHub repo, add a line to `packages/skills.txt`. The `link` step
+clones each source to `~/.local/share/bootstrap/skills/` and symlinks its
+skills into `~/.agents/skills`, and it writes a `.gitignore` there so the
+fetched ones stay out of git. Every skill in `~/.agents/skills` also gets a
+link in `~/.claude/skills`, the only place Claude Code loads them from, when
+that directory already exists. A skill kept in this repo wins over a fetched one
+with the same name, and among sources the one listed first wins.
 
 **A fish plugin.** Add a line to `home/.config/fish/fish_plugins`.
 

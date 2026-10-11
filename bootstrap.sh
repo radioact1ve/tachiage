@@ -8,6 +8,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$ROOT/lib/packages.sh"
 . "$ROOT/lib/wsl.sh"
 . "$ROOT/lib/link.sh"
+. "$ROOT/lib/skills.sh"
 . "$ROOT/lib/shell.sh"
 
 ALL_STEPS="packages link mise shell"
@@ -18,7 +19,7 @@ Usage: bootstrap.sh [-n|--dry-run] [step...]
 
 Steps (default: all, in this order):
   packages  install system packages from packages/*.txt
-  link      symlink home/ into \$HOME
+  link      symlink home/ into \$HOME, fetch the agent skills in packages/skills.txt
   mise      install mise and the tools in ~/.config/mise/config.toml
   shell     make fish the login shell, install fisher and its plugins
 
