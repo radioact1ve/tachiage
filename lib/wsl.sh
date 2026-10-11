@@ -19,6 +19,7 @@ setup_windows_font() {
 
   install_windows_font "$1" "$appdata" "$appdata_win"
   set_windows_terminal_profile "$appdata"
+  set_windows_terminal_default_profile "$appdata" "Ubuntu"
 }
 
 # Per-user install: needs no admin rights, but each file has to be registered.
@@ -77,3 +78,35 @@ set_windows_terminal_profile() {
     rm -f "$tmp"
   done
 }
+
+# Sets the default profile of Windows Terminal.
+set_windows_terminal_default_profile() {
+  local appdata="$1"
+  local target_profile="$2"
+  local backup="$HOME/.local/state/bootstrap/backup/$(date +%Y%m%d-%H%M%S)/windows-terminal-default"
+  local settings current tmp
+
+  for settings in \
+    "$appdata"/Packages/Microsoft.WindowsTerminal*/LocalState/settings.json \
+    "$appdata/Microsoft/Windows Terminal/settings.json"; do
+    [ -f "$settings" ] || continue
+
+    if ! current="$(jq -r --arg name "$target_profile" \
+      'if ([.profiles.list[]? | select(.name == $name) | .guid] | length > 0) then (if .defaultProfile == ([.profiles.list[]? | select(.name == $name) | .guid][0]) then "yes" else "no" end) else "missing" end' \
+      "$settings" 2>/dev/null)"; then
+      continue
+    fi
+    if [ "$current" = "yes" ] || [ "$current" = "missing" ]; then continue; fi
+
+    log "Setting the Windows Terminal default profile to $target_profile"
+    run mkdir -p "$backup"
+    run cp "$settings" "$backup/settings.json"
+    tmp="$(mktemp)"
+    jq --indent 4 --arg name "$target_profile" \
+      '.defaultProfile = ([.profiles.list[]? | select(.name == $name) | .guid][0] // .defaultProfile)' \
+      "$settings" > "$tmp"
+    run cp "$tmp" "$settings"
+    rm -f "$tmp"
+  done
+}
+

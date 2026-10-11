@@ -97,4 +97,10 @@ install_mise_tools() {
   fi
   log "Installing mise tools"
   (cd "$HOME" && run mise install --yes)
+
+  # pi installs whatever is in the packages list of its linked settings file.
+  if [ -f "$HOME/.pi/agent/settings.json" ]; then
+    log "Installing pi packages"
+    (cd "$HOME" && run_quiet mise exec -- pi update --extensions)
+  fi
 }

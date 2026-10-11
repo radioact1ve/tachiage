@@ -81,6 +81,10 @@ link in `~/.claude/skills`, the only place Claude Code loads them from, when
 that directory already exists. A skill kept in this repo wins over a fetched one
 with the same name, and among sources the one listed first wins.
 
+**A pi package.** Add its source to the `packages` array in
+`home/.pi/agent/settings.json`. The `mise` step runs `pi update --extensions`
+to install what is listed.
+
 **A fish plugin.** Add a line to `home/.config/fish/fish_plugins`.
 
 **A LazyVim extra.** Add its module name to the `extras` array in
