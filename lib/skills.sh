@@ -4,11 +4,12 @@
 
 SKILLS_CACHE="${XDG_DATA_HOME:-$HOME/.local/share}/bootstrap/skills"
 
-# ~/.agents/skills is a symlink into this repo, so fetched skills are listed in
-# a generated .gitignore there to keep them out of git.
-write_skills_ignore() {
-  printf '.gitignore\n%s' "$SKILLS_IGNORE" > "$1"
-}
+# ~/.agents/skills is a symlink into this repo, so the fetched skills, which are
+# per-machine symlinks, must stay out of git. They are ignored by a rule in the
+# repo-root .gitignore rather than one inside the skills directory: pi reads
+# .gitignore files within its skill scan and would skip every listed skill, but
+# it never reads ancestors of the scan root, so a repo-root rule is invisible to
+# it. Skills kept in this repo need a matching "!" exception there.
 
 # Claude Code only loads skills from ~/.claude/skills, so every skill in
 # ~/.agents/skills gets a link there too.
@@ -97,9 +98,11 @@ install_skills() {
     printf '  removed ~/.agents/skills/%s\n' "$name"
   done
 
-  SKILLS_IGNORE="${claimed#"$nl"}"
-  if [ -d "$skills_dir" ] && [ "$(cat "$skills_dir/.gitignore" 2>/dev/null)" != "$(printf '.gitignore\n%s' "$SKILLS_IGNORE")" ]; then
-    run write_skills_ignore "$skills_dir/.gitignore"
+  # A .gitignore here from an older version of this script would hide every
+  # skill from pi, so drop it; the fetched skills are now ignored by a rule in
+  # the repo-root .gitignore.
+  if [ -f "$skills_dir/.gitignore" ]; then
+    run rm "$skills_dir/.gitignore"
   fi
 
   link_claude_skills "$skills_dir"

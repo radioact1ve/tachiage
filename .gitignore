@@ -1,1 +1,8 @@
 home/.config/nvim/lazy-lock.json
+
+# Fetched agent skills are per-machine symlinks. Ignored here at the repo root,
+# not inside the directory, so pi (which reads .gitignore within its skill scan
+# but not in ancestors) still sees them. A skill kept in this repo needs a "!"
+# exception below.
+home/.agents/skills/*
+!home/.agents/skills/.gitkeep
