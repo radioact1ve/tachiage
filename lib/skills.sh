@@ -18,8 +18,10 @@ link_claude_skills() {
   local claude_dir="$HOME/.claude/skills"
   local entry name dst
 
-  # No ~/.claude/skills means no Claude Code here, so there is nothing to do.
-  [ -d "$claude_dir" ] || return 0
+  # No ~/.claude means no Claude Code here, so there is nothing to do.
+  [ -d "$HOME/.claude" ] || return 0
+
+  run mkdir -p "$claude_dir"
 
   for entry in "$skills_dir"/*; do
     [ -f "$entry/SKILL.md" ] || continue
