@@ -21,3 +21,8 @@ if status is-interactive
         zoxide init fish | source
     end
 end
+
+# Machine-specific overrides (e.g. env vars or aliases) live here, outside the repo.
+if test -f ~/.config/fish/local.fish
+    source ~/.config/fish/local.fish
+end
