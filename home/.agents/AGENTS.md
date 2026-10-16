@@ -1,5 +1,16 @@
 # AGENTS.md
 
+## General Behaviors
+
+When I ask questions, make sure you understand and confirm with me before 
+you go and make changes. Always propose a plan and ask for confirmation before 
+modifying any files or running code-changing tools.
+
+## Programming and Coding
+
+When writing new code, plan to write at least unit tests as well. Ask to 
+confirm. Also ask about integration tests.
+
 ## Skills
 
 Skills live in `~/.agents/skills/`. Each one is a directory with a `SKILL.md`
